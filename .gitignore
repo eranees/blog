@@ -1,3 +1,6 @@
+# ROOT LEVEL
+node_modules
+
 # === BACKEND ===
 /backend/node_modules/
 /backend/logs/
