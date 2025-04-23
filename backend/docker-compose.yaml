@@ -1,0 +1,73 @@
+services:
+  app:
+    container_name: blog_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - ENV_FILE=.env
+    env_file:
+      - .env
+    ports:
+      - ${APP_PORT:-3000}:${APP_PORT:-3000}
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - minio
+    networks:
+      - api-network
+  postgres:
+    container_name: blog_postgres
+    image: postgres:16.4-alpine3.20
+    environment:
+      POSTGRES_USER: ${POSTGRES_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-blog}
+      PGDATA: /data/postgres
+    env_file:
+      - .env
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - '${POSTGRES_PORT:-5434}:5432'
+    restart: unless-stopped
+    networks:
+      - api-network
+
+  pgadmin:
+    container_name: blog_pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-pgadmin@yopmail.com}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-pgadmin}
+    ports:
+      - "5050:80"
+    networks:
+      - api-network
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file:
+      - .env
+    environment:
+      MINIO_ROOT_USER: ${BLOB_ACCESS_KEY_ID}
+      MINIO_ROOT_PASSWORD: ${BLOB_SECRET_ACCESS_KEY}
+    volumes:
+      - minio_data:/data # Persistent storage for MinIO
+    command: server /data --console-address ":9001"
+    restart: always
+    networks:
+      - api-network
+
+volumes:
+  postgres:
+  minio_data:
+    driver: local
+
+networks:
+  api-network:
+    driver: bridge

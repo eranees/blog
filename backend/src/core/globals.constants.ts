@@ -46,3 +46,15 @@ export enum StatusCodes {
   Forbidden = 403,
   Conflict = 409,
 }
+
+// Params List
+export enum OrderDirection {
+  Asc = 'ASC',
+  Desc = 'DESC',
+}
+
+export enum TagOrderBy {
+  CreatedAt = 'createdAt',
+  UpdatedAt = 'updatedAt',
+  Name = 'name',
+}

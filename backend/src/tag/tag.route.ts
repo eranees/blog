@@ -22,5 +22,26 @@ export class TagRouter {
       RoleGuard([UserType.Admin]),
       this.tagController.create.bind(this.tagController),
     );
+
+    this.router.patch(
+      '/:id',
+      AccessTokenGuard,
+      RoleGuard([UserType.Admin]),
+      this.tagController.update.bind(this.tagController),
+    );
+
+    this.router.get(
+      '/:id',
+      AccessTokenGuard,
+      RoleGuard([UserType.Admin]),
+      this.tagController.findOne.bind(this.tagController),
+    );
+
+    this.router.get(
+      '/',
+      AccessTokenGuard,
+      RoleGuard([UserType.Admin]),
+      this.tagController.findAll.bind(this.tagController),
+    );
   }
 }
